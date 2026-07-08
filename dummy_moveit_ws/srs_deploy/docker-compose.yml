@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  srs:
+    image: ossrs/srs:5
+    container_name: srs-low-latency
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "1935:1935"    # RTMP/SRT 端口（SRS 默认 SRT 也是 1935）
+      - "8080:8080"    # Web 页面端口
+      - "1985:1985"    # HTTP API 端口
+      - "8000:8000/udp" # WebRTC/RTC 端口（UDP）
+    environment:
+      # 在云服务器上将此环境变量设置为公网 IP，用于 WebRTC candidate
+      - CANDIDATE=${SRS_CANDIDATE_IP}
+    volumes:
+      - ./srs.conf:/usr/local/srs/conf/srs.conf:ro
+    command: ["./objs/srs", "-c", "conf/srs.conf"]
+
